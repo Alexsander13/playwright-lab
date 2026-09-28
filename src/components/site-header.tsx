@@ -1,4 +1,4 @@
-import { LogIn, LogOut } from "lucide-react";
+import { LayoutDashboard, LogIn, LogOut } from "lucide-react";
 import Link from "next/link";
 
 import { signOutAction } from "@/app/actions";
@@ -19,6 +19,13 @@ export async function SiteHeader() {
         </Link>
         {user ? (
           <div className="flex items-center gap-4">
+            <Link
+              className="inline-flex min-h-10 items-center gap-2 rounded-md px-3 text-sm font-medium transition hover:bg-white"
+              href="/dashboard"
+            >
+              <LayoutDashboard aria-hidden="true" size={16} />
+              <span>Мой курс</span>
+            </Link>
             <span className="hidden text-sm text-[var(--muted)] sm:block">
               {user.email}
             </span>
