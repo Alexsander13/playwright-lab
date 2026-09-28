@@ -1,7 +1,12 @@
+import { moduleTwoTasks } from "@/lib/module-two";
 import { moduleOneTasks } from "@/lib/module-one";
 import { moduleZeroTasks } from "@/lib/module-zero";
 
-export const courseTasks = [...moduleZeroTasks, ...moduleOneTasks];
+export const courseTasks = [
+  ...moduleZeroTasks,
+  ...moduleOneTasks,
+  ...moduleTwoTasks,
+];
 
 export function getCourseTask(moduleId: string, slug: string) {
   return courseTasks.find(
