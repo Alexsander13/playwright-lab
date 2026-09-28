@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { courseModules, courseTaskCount } from "@/lib/course";
+import { courseTasks } from "@/lib/course-tasks";
 
 type ProgressRow = {
   module_id: string;
@@ -57,6 +58,9 @@ export default async function DashboardPage() {
   );
   const completionPercent = Math.round(
     (completedTaskCount / courseTaskCount) * 100,
+  );
+  const nextCourseTask = courseTasks.find(
+    (task) => !completedByModule.get(task.moduleId)?.has(task.id),
   );
   const learnerName =
     user.user_metadata.user_name ??
@@ -122,9 +126,12 @@ export default async function DashboardPage() {
             const modulePercent = Math.round(
               (completedCount / courseModule.taskCount) * 100,
             );
-            const nextTask = courseModule.tasks?.find(
-              (task) => !completedTasks.has(task.id),
-            );
+            const nextTask =
+              nextCourseTask?.moduleId === courseModule.id
+                ? courseModule.tasks?.find(
+                    (task) => task.id === nextCourseTask.id,
+                  )
+                : undefined;
 
             return (
               <li
@@ -146,9 +153,13 @@ export default async function DashboardPage() {
                     >
                       {completedCount === 0 ? "Начать" : "Продолжить"}: {nextTask.title}
                     </Link>
-                  ) : courseModule.tasks?.length ? (
+                  ) : courseModule.tasks?.length && completedCount === courseModule.taskCount ? (
                     <p className="mt-2 text-sm font-medium text-[var(--accent)]">
                       Все задачи модуля завершены
+                    </p>
+                  ) : courseModule.tasks?.length && nextCourseTask?.moduleId !== courseModule.id ? (
+                    <p className="mt-2 text-sm text-[var(--muted)]">
+                      Завершите предыдущий модуль, чтобы открыть задачи.
                     </p>
                   ) : null}
                 </div>
