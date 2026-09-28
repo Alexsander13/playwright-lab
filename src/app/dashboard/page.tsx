@@ -117,10 +117,13 @@ export default async function DashboardPage() {
 
         <ol className="mt-4 divide-y divide-[var(--line)]">
           {courseModules.map((courseModule, index) => {
-            const completedCount =
-              completedByModule.get(courseModule.id)?.size ?? 0;
+            const completedTasks = completedByModule.get(courseModule.id) ?? new Set();
+            const completedCount = completedTasks.size;
             const modulePercent = Math.round(
               (completedCount / courseModule.taskCount) * 100,
+            );
+            const nextTask = courseModule.tasks?.find(
+              (task) => !completedTasks.has(task.id),
             );
 
             return (
@@ -136,17 +139,17 @@ export default async function DashboardPage() {
                   <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
                     {courseModule.summary}
                   </p>
-                  {courseModule.firstTaskPath ? (
+                  {nextTask ? (
                     <Link
                       className="mt-2 inline-flex min-h-9 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4"
-                      href={courseModule.firstTaskPath}
+                      href={`/modules/${courseModule.id}/tasks/${nextTask.slug}`}
                     >
-                      {completedByModule.get(courseModule.id)?.has(
-                        courseModule.firstTaskId ?? "",
-                      )
-                        ? "Открыть задачу 0.1"
-                        : "Начать задачу 0.1"}
+                      {completedCount === 0 ? "Начать" : "Продолжить"}: {nextTask.title}
                     </Link>
+                  ) : courseModule.tasks?.length ? (
+                    <p className="mt-2 text-sm font-medium text-[var(--accent)]">
+                      Все задачи модуля завершены
+                    </p>
                   ) : null}
                 </div>
                 <p className="text-sm tabular-nums text-[var(--muted)]">

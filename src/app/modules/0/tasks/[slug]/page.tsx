@@ -1,0 +1,233 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+
+import { completeCourseTaskAction } from "@/app/actions";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getModuleZeroTask, moduleZeroTasks } from "@/lib/module-zero";
+
+type TaskPageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{
+    blocked?: string;
+    completed?: string;
+    saveError?: string;
+  }>;
+};
+
+export default async function ModuleZeroTaskPage({
+  params,
+  searchParams,
+}: TaskPageProps) {
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
+  const task = getModuleZeroTask(slug);
+
+  if (!task) {
+    notFound();
+  }
+
+  const taskIndex = moduleZeroTasks.findIndex(
+    (candidate) => candidate.id === task.id,
+  );
+  const previousTask = moduleZeroTasks[taskIndex - 1];
+  const nextTask = moduleZeroTasks[taskIndex + 1];
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(`/auth/sign-in?next=${encodeURIComponent(`/modules/0/tasks/${slug}`)}`);
+  }
+
+  const { data: progressRows, error: progressError } = await supabase
+    .from("user_progress")
+    .select("task_id, is_completed, completed_at")
+    .eq("module_id", "0");
+  const progressByTask = new Map(
+    (progressRows ?? []).map((row) => [row.task_id, row]),
+  );
+  const isCompleted = progressByTask.get(task.id)?.is_completed === true;
+  const previousTaskCompleted = previousTask
+    ? progressByTask.get(previousTask.id)?.is_completed === true
+    : true;
+  const canComplete = previousTaskCompleted && !progressError;
+  const completedAt = progressByTask.get(task.id)?.completed_at;
+
+  return (
+    <main className="mx-auto min-h-[calc(100svh-4rem)] max-w-4xl px-6 py-10 sm:py-14">
+      <Link
+        className="text-sm font-medium text-[var(--accent)] underline underline-offset-4"
+        href="/dashboard"
+      >
+        Назад к программе
+      </Link>
+
+      <header className="mt-8 border-b border-[var(--line)] pb-7">
+        <p className="text-sm font-medium text-[var(--accent)]">
+          Модуль 0 · Задача {task.id}
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+          {task.title}
+        </h1>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--muted)]">
+          {task.summary}
+        </p>
+      </header>
+
+      <div className="divide-y divide-[var(--line)]">
+        <section className="py-7">
+          <h2 className="text-lg font-semibold">Контекст и проблема</h2>
+          <p className="mt-3 max-w-2xl leading-7 text-[var(--muted)]">
+            {task.context}
+          </p>
+        </section>
+
+        <section className="py-7">
+          <h2 className="text-lg font-semibold">Короткая теория</h2>
+          <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--muted)]">
+            {task.theory.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="py-7">
+          <h2 className="text-lg font-semibold">Что сделать</h2>
+          <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm leading-6 text-[var(--muted)]">
+            {task.steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          {task.externalLink ? (
+            <a
+              className="mt-5 inline-flex min-h-10 items-center rounded-md border border-[var(--line)] bg-white px-4 text-sm font-medium transition hover:border-[var(--accent)]"
+              href={task.externalLink.href}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {task.externalLink.label}
+            </a>
+          ) : null}
+          {task.downloadPath ? (
+            <a
+              className="mt-5 inline-flex min-h-10 items-center rounded-md border border-[var(--line)] bg-white px-4 text-sm font-medium transition hover:border-[var(--accent)]"
+              download="demo-0.1.mjs"
+              href={task.downloadPath}
+            >
+              Скачать демо-скрипт
+            </a>
+          ) : null}
+          {task.commands?.map((command) => (
+            <pre
+              className="mt-4 overflow-x-auto rounded-md bg-[#202522] p-4 text-sm text-white"
+              key={command}
+            >
+              <code>{command}</code>
+            </pre>
+          ))}
+        </section>
+
+        <section className="py-7">
+          <h2 className="text-lg font-semibold">Файлы и ожидаемые изменения</h2>
+          <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--muted)]">
+            {task.files.map((file) => (
+              <li key={file}>{file}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="py-7">
+          <h2 className="text-lg font-semibold">Definition of Done</h2>
+          <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--muted)]">
+            {task.definitionOfDone.map((criterion) => (
+              <li key={criterion}>{criterion}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="py-7">
+          <h2 className="text-lg font-semibold">Подсказки</h2>
+          <div className="mt-4 divide-y divide-[var(--line)] border-y border-[var(--line)]">
+            {task.hints.map((hint, index) => (
+              <details className="py-3" key={hint}>
+                <summary className="cursor-pointer text-sm font-medium">
+                  Уровень {index + 1}
+                </summary>
+                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+                  {hint}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        {task.checkpoint ? (
+          <section className="py-7">
+            <h2 className="text-lg font-semibold">Git-чекпоинт</h2>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+              {task.checkpoint}
+            </p>
+          </section>
+        ) : null}
+      </div>
+
+      {progressError ? (
+        <p className="mt-6 border-l-2 border-red-600 pl-3 text-sm text-red-800" role="alert">
+          Не удалось загрузить прогресс. Обновите страницу чуть позже.
+        </p>
+      ) : null}
+      {query.saveError ? (
+        <p className="mt-6 border-l-2 border-red-600 pl-3 text-sm text-red-800" role="alert">
+          Не удалось сохранить выполнение. Попробуйте ещё раз.
+        </p>
+      ) : null}
+      {query.blocked ? (
+        <p className="mt-6 border-l-2 border-amber-600 pl-3 text-sm text-amber-900" role="alert">
+          Сначала завершите предыдущую задачу: {previousTask?.id} · {previousTask?.title}.
+        </p>
+      ) : null}
+      {query.completed ? (
+        <p className="mt-6 border-l-2 border-[var(--accent)] pl-3 text-sm font-medium text-[var(--accent)]" role="status">
+          Задача {task.id} отмечена как выполненная.
+        </p>
+      ) : null}
+
+      <footer className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-[var(--line)] pt-6">
+        <div>
+          {isCompleted ? (
+            <p className="text-sm font-medium text-[var(--accent)]">
+              Задача выполнена
+              {completedAt
+                ? ` · ${new Intl.DateTimeFormat("ru", {
+                    dateStyle: "medium",
+                  }).format(new Date(completedAt))}`
+                : ""}
+            </p>
+          ) : canComplete ? (
+            <form action={completeCourseTaskAction}>
+              <input name="taskId" type="hidden" value={task.id} />
+              <button
+                className="min-h-11 rounded-md bg-[var(--accent)] px-5 text-sm font-semibold text-white transition hover:brightness-110"
+                type="submit"
+              >
+                Отметить задачу выполненной
+              </button>
+            </form>
+          ) : (
+            <p className="text-sm text-[var(--muted)]">
+              Завершите предыдущую задачу, чтобы открыть отметку выполнения.
+            </p>
+          )}
+        </div>
+        {nextTask ? (
+          <Link
+            className="text-sm font-medium text-[var(--accent)] underline underline-offset-4"
+            href={`/modules/0/tasks/${nextTask.slug}`}
+          >
+            Следующая задача: {nextTask.id}
+          </Link>
+        ) : null}
+      </footer>
+    </main>
+  );
+}
