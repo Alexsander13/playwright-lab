@@ -123,6 +123,8 @@ export default async function DashboardPage() {
           {courseModules.map((courseModule, index) => {
             const completedTasks = completedByModule.get(courseModule.id) ?? new Set();
             const completedCount = completedTasks.size;
+            const completedLessons =
+              courseModule.tasks?.filter((task) => completedTasks.has(task.id)) ?? [];
             const modulePercent = Math.round(
               (completedCount / courseModule.taskCount) * 100,
             );
@@ -161,6 +163,25 @@ export default async function DashboardPage() {
                     <p className="mt-2 text-sm text-[var(--muted)]">
                       Завершите предыдущий модуль, чтобы открыть задачи.
                     </p>
+                  ) : null}
+                  {completedLessons.length > 0 ? (
+                    <details className="mt-2 max-w-lg">
+                      <summary className="min-h-9 cursor-pointer py-2 text-sm font-medium text-[var(--muted)] underline decoration-[var(--line)] underline-offset-4 hover:text-[var(--ink)]">
+                        Пройденные уроки · {completedLessons.length}
+                      </summary>
+                      <ol className="ml-2 border-l border-[var(--line)] py-1 pl-4">
+                        {completedLessons.map((lesson) => (
+                          <li key={lesson.id}>
+                            <Link
+                              className="inline-flex min-h-9 items-center text-sm text-[var(--accent)] underline underline-offset-4"
+                              href={`/modules/${courseModule.id}/tasks/${lesson.slug}`}
+                            >
+                              {lesson.id} · {lesson.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </ol>
+                    </details>
                   ) : null}
                 </div>
                 <p className="text-sm tabular-nums text-[var(--muted)]">
