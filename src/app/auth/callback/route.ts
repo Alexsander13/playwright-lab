@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getSafeInternalPath } from "@/lib/auth-redirect";
+import { profileFromAuthUser } from "@/lib/supabase/profile";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
@@ -23,6 +24,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(
       new URL("/?authError=callback", request.url),
     );
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const { error: profileError } = await supabase.from("profiles").upsert(
+      profileFromAuthUser(user),
+      { onConflict: "id" },
+    );
+
+    if (profileError) {
+      return NextResponse.redirect(
+        new URL("/?authError=profile", request.url),
+      );
+    }
   }
 
   return NextResponse.redirect(new URL(nextPath, request.url));

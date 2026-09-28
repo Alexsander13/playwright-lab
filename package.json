@@ -7,13 +7,15 @@
     "build": "next build",
     "start": "next start",
     "dev": "next dev",
-    "cli:dev": "tsx src/index.ts"
+    "cli:dev": "tsx src/index.ts",
+    "demo:0.1": "tsx scripts/demo-0.1.ts"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.10.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "playwright": "^1.63.0",
     "postcss": "^8.5.28",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.19.2",

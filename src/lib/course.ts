@@ -3,6 +3,8 @@ export type CourseModule = {
   title: string;
   summary: string;
   taskCount: number;
+  firstTaskId?: string;
+  firstTaskPath?: string;
 };
 
 export const courseModules: CourseModule[] = [
@@ -11,6 +13,8 @@ export const courseModules: CourseModule[] = [
     title: "Начало проекта и первая автоматизация",
     summary: "Подготовка окружения и первый рабочий smoke-тест.",
     taskCount: 5,
+    firstTaskId: "0.1",
+    firstTaskPath: "/modules/0/tasks/0-1",
   },
   {
     id: "1",

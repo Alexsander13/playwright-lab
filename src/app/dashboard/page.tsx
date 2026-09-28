@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { courseModules, courseTaskCount } from "@/lib/course";
@@ -135,6 +136,18 @@ export default async function DashboardPage() {
                   <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
                     {courseModule.summary}
                   </p>
+                  {courseModule.firstTaskPath ? (
+                    <Link
+                      className="mt-2 inline-flex min-h-9 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4"
+                      href={courseModule.firstTaskPath}
+                    >
+                      {completedByModule.get(courseModule.id)?.has(
+                        courseModule.firstTaskId ?? "",
+                      )
+                        ? "Открыть задачу 0.1"
+                        : "Начать задачу 0.1"}
+                    </Link>
+                  ) : null}
                 </div>
                 <p className="text-sm tabular-nums text-[var(--muted)]">
                   {completedCount} / {courseModule.taskCount} задач
