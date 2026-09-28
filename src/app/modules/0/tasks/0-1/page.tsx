@@ -65,16 +65,30 @@ export default async function IntroTaskPage({
         <section className="py-7">
           <h2 className="text-lg font-semibold">Запуск</h2>
           <p className="mt-3 max-w-2xl leading-7 text-[var(--muted)]">
+            Скачайте готовый файл и сохраните его как
+            <code className="mx-1 rounded bg-white px-1.5 py-0.5 text-sm text-[var(--ink)]">
+              demo-0.1.mjs
+            </code>
+            в отдельную папку.
+          </p>
+          <a
+            className="mt-4 inline-flex min-h-10 items-center rounded-md border border-[var(--line)] bg-white px-4 text-sm font-medium transition hover:border-[var(--accent)]"
+            download="demo-0.1.mjs"
+            href="/demos/demo-0.1.mjs"
+          >
+            Скачать демо-скрипт
+          </a>
+          <p className="mt-6 max-w-2xl leading-7 text-[var(--muted)]">
             Если Chromium ещё не установлен, выполните это один раз:
           </p>
           <pre className="mt-3 overflow-x-auto rounded-md bg-[#202522] p-4 text-sm text-white">
-            <code>npx playwright install chromium</code>
+            <code>npx --yes --package=playwright playwright install chromium</code>
           </pre>
           <p className="mt-4 max-w-2xl leading-7 text-[var(--muted)]">
-            Затем запустите демонстрацию из корня проекта:
+            Затем из папки со скриптом запустите одну команду:
           </p>
           <pre className="mt-3 overflow-x-auto rounded-md bg-[#202522] p-4 text-sm text-white">
-            <code>npm run demo:0.1</code>
+            <code>npx --yes --package=playwright --call &quot;node demo-0.1.mjs&quot;</code>
           </pre>
         </section>
 
