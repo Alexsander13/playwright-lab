@@ -1,3 +1,15 @@
+import type { CourseLesson } from "@/lib/module-zero";
+import { moduleZeroTasks } from "@/lib/module-zero";
+import { moduleOneTasks } from "@/lib/module-one";
+import { moduleTwoTasks } from "@/lib/module-two";
+import { moduleThreeTasks } from "@/lib/module-three";
+import { moduleFourTasks } from "@/lib/module-four";
+import { moduleFiveTasks } from "@/lib/module-five";
+import { moduleSixTasks } from "@/lib/module-six";
+import { moduleSevenTasks } from "@/lib/module-seven";
+import { moduleEightTasks } from "@/lib/module-eight";
+import { moduleNineTasks } from "@/lib/module-nine";
+
 export type CourseModule = {
   id: string;
   title: string;
@@ -6,91 +18,80 @@ export type CourseModule = {
   tasks?: { id: string; slug: string; title: string }[];
 };
 
+function taskLinks(lessons: CourseLesson[]) {
+  return lessons.map(({ id, slug, title }) => ({ id, slug, title }));
+}
+
 export const courseModules: CourseModule[] = [
   {
     id: "0",
     title: "Начало проекта и первая автоматизация",
     summary: "Подготовка окружения и первый рабочий smoke-тест.",
     taskCount: 5,
-    tasks: [
-      { id: "0.1", slug: "0-1", title: "Первый запуск автоматизации" },
-      { id: "0.2", slug: "0-2", title: "Создание репозитория" },
-      { id: "0.3", slug: "0-3", title: "Окружение и браузер" },
-      { id: "0.4", slug: "0-4", title: "Конфигурация Playwright" },
-      { id: "0.5", slug: "0-5", title: "Первый smoke-тест" },
-    ],
+    tasks: taskLinks(moduleZeroTasks),
   },
   {
     id: "1",
     title: "TypeScript для автоматизатора",
     summary: "Типы, тестовые данные, асинхронность и конфигурация.",
     taskCount: 6,
-    tasks: [
-      { id: "1.1", slug: "1-1", title: "Типы TestUser и Note" },
-      { id: "1.2", slug: "1-2", title: "Уникальные тестовые данные" },
-      { id: "1.3", slug: "1-3", title: "Асинхронность и health-check" },
-      { id: "1.4", slug: "1-4", title: "Параллельные запросы" },
-      { id: "1.5", slug: "1-5", title: "Конфигурация URL" },
-      { id: "1.6", slug: "1-6", title: "Безопасность окружения" },
-    ],
+    tasks: taskLinks(moduleOneTasks),
   },
   {
     id: "2",
     title: "Надёжные UI-тесты Notes App",
     summary: "Устойчивые локаторы и сценарии работы с заметками.",
     taskCount: 8,
-    tasks: [
-      { id: "2.1", slug: "2-1", title: "Первые локаторы Notes App" },
-      { id: "2.2", slug: "2-2", title: "Устойчивые локаторы" },
-      { id: "2.3", slug: "2-3", title: "Регистрация через UI" },
-      { id: "2.4", slug: "2-4", title: "Вход и навигация" },
-      { id: "2.5", slug: "2-5", title: "Создание заметки" },
-      { id: "2.6", slug: "2-6", title: "Редактирование заметки" },
-      { id: "2.7", slug: "2-7", title: "Завершение и удаление" },
-      { id: "2.8", slug: "2-8", title: "Поиск и изоляция" },
-    ],
+    tasks: taskLinks(moduleTwoTasks),
   },
   {
     id: "3",
     title: "API: пользователи и заметки",
     summary: "Проверки REST API, клиенты и очистка тестовых данных.",
     taskCount: 7,
+    tasks: taskLinks(moduleThreeTasks),
   },
   {
     id: "4",
     title: "Сквозные UI + API сценарии",
     summary: "Подготовка данных через API и проверка результата в UI.",
     taskCount: 6,
+    tasks: taskLinks(moduleFourTasks),
   },
   {
     id: "5",
     title: "Архитектура, fixtures и данные",
     summary: "Page Objects, fixtures, изоляция и надёжная очистка.",
     taskCount: 6,
+    tasks: taskLinks(moduleFiveTasks),
   },
   {
     id: "6",
     title: "Лаборатория возможностей Playwright",
     summary: "Файлы, фреймы, окна, диалоги, геолокация и сеть.",
     taskCount: 8,
+    tasks: taskLinks(moduleSixTasks),
   },
   {
     id: "7",
     title: "Диагностика и параллельность",
     summary: "Стабильность тестов, артефакты падений и workers.",
     taskCount: 4,
+    tasks: taskLinks(moduleSevenTasks),
   },
   {
     id: "8",
     title: "Отчёты, CI и выпуск проекта",
     summary: "Отчётность, GitHub Actions, regression и sharding.",
     taskCount: 5,
+    tasks: taskLinks(moduleEightTasks),
   },
   {
     id: "9",
     title: "AI-ассистенты в автоматизации",
     summary: "Локаторы с ИИ и безопасный AI-репортёр.",
     taskCount: 4,
+    tasks: taskLinks(moduleNineTasks),
   },
 ];
 
