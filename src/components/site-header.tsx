@@ -33,13 +33,13 @@ export async function SiteHeader() {
             </form>
           </div>
         ) : (
-          <Link
+          <a
             className="inline-flex min-h-10 items-center gap-2 rounded-md bg-[var(--accent)] px-4 text-sm font-medium text-white transition hover:brightness-110"
             href="/auth/sign-in"
           >
             <LogIn aria-hidden="true" size={16} />
             <span>Войти через GitHub</span>
-          </Link>
+          </a>
         )}
       </div>
     </header>
