@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --ink: #202522;
+  --muted: #64706a;
+  --line: #dce3de;
+  --paper: #f6f8f5;
+  --accent: #28734f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Avenir Next", Avenir, sans-serif;
+}

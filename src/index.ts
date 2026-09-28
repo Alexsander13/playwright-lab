@@ -1,3 +1,3 @@
-const appName = 'RooCline';
+const appName = 'Playwright Lab';
 
-console.log(`${appName} initialized successfully.`);
+console.log(`Проект ${appName} успешно запущен.`);
