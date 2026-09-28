@@ -124,7 +124,6 @@ export const moduleZeroTasks: CourseLesson[] = [
       "Установите Chromium командой npx playwright install chromium.",
       "Запустите базовый пример командой npx playwright test.",
       "Если пример прошёл, посмотрите краткий отчёт в терминале.",
-      "Проверьте git status --short. Если вывода нет, это ожидаемо: установка не создала изменений для commit.",
     ],
     files: [
       "node_modules/ — установленные локальные зависимости; эта папка не коммитится.",
@@ -139,18 +138,11 @@ export const moduleZeroTasks: CourseLesson[] = [
     hints: [
       "Выполняйте команды из корня клонированного репозитория.",
       "Если npm ci сообщает, что lock-файла нет, проверьте, не пропущена ли задача 0.2 или нужный starter commit.",
-      "Если Playwright сообщает об отсутствующем executable, повторите npx playwright install chromium. Текст Git-чекпоинта — не shell-команда; не вводите слова chore: install Playwright dependencies в терминал.",
+      "Если Playwright сообщает об отсутствующем executable, повторите npx playwright install chromium. npm ci использует готовый lock-файл и не меняет исходники.",
     ],
     checkpoint:
-      "Commit на этой задаче не требуется: package.json и package-lock.json уже входят в starter-template, а npm ci не меняет их. Проверьте git status --short; конфигурационные изменения и commit будут в задаче 0.4.",
-    commands: [
-      "node -v",
-      "npm -v",
-      "npm ci",
-      "npx playwright install chromium",
-      "npx playwright test",
-      "git status --short",
-    ],
+      "На этом шаге Git-коммит и дополнительные Git-команды не нужны: зависимости уже описаны в starter-template, а npm ci устанавливает их локально. Первый кодовый Git-чекпоинт будет в задаче 0.4 после изменения конфигурации.",
+    commands: ["node -v", "npm -v", "npm ci", "npx playwright install chromium", "npx playwright test"],
   },
   {
     moduleId: "0",
