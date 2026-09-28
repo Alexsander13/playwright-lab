@@ -112,7 +112,7 @@ export const moduleZeroTasks: CourseLesson[] = [
     title: "Окружение и первый запуск Playwright",
     summary: "Установить зависимости и браузер, запустить базовый пример.",
     context:
-      "Node.js запускает учебные скрипты, npm устанавливает зависимости, а Playwright отдельно загружает браузерные бинарники. Это три части окружения, и успешная установка одной не гарантирует наличие остальных.",
+      "Node.js запускает учебные скрипты, npm устанавливает зависимости, а Playwright отдельно загружает браузерные бинарники. Это три части окружения, и успешная установка одной не гарантирует наличие остальных. В starter-template package.json и package-lock.json уже подготовлены: npm ci устанавливает node_modules, но не меняет Git-файлы.",
     theory: [
       "package.json описывает зависимости и команды проекта.",
       "package-lock.json фиксирует разрешённые версии; npm ci устанавливает именно их.",
@@ -124,6 +124,7 @@ export const moduleZeroTasks: CourseLesson[] = [
       "Установите Chromium командой npx playwright install chromium.",
       "Запустите базовый пример командой npx playwright test.",
       "Если пример прошёл, посмотрите краткий отчёт в терминале.",
+      "Проверьте git status --short. Если вывода нет, это ожидаемо: установка не создала изменений для commit.",
     ],
     files: [
       "node_modules/ — установленные локальные зависимости; эта папка не коммитится.",
@@ -138,11 +139,18 @@ export const moduleZeroTasks: CourseLesson[] = [
     hints: [
       "Выполняйте команды из корня клонированного репозитория.",
       "Если npm ci сообщает, что lock-файла нет, проверьте, не пропущена ли задача 0.2 или нужный starter commit.",
-      "Если Playwright сообщает об отсутствующем executable, повторите npx playwright install chromium.",
+      "Если Playwright сообщает об отсутствующем executable, повторите npx playwright install chromium. Текст Git-чекпоинта — не shell-команда; не вводите слова chore: install Playwright dependencies в терминал.",
     ],
     checkpoint:
-      "Сохраните подтверждённое состояние зависимостей сообщением chore: install Playwright dependencies.",
-    commands: ["node -v", "npm -v", "npm ci", "npx playwright install chromium", "npx playwright test"],
+      "Commit на этой задаче не требуется: package.json и package-lock.json уже входят в starter-template, а npm ci не меняет их. Проверьте git status --short; конфигурационные изменения и commit будут в задаче 0.4.",
+    commands: [
+      "node -v",
+      "npm -v",
+      "npm ci",
+      "npx playwright install chromium",
+      "npx playwright test",
+      "git status --short",
+    ],
   },
   {
     moduleId: "0",
