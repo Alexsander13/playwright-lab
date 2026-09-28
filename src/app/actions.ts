@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 import { profileFromAuthUser } from "@/lib/supabase/profile";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { moduleZeroTasks } from "@/lib/module-zero";
+import { courseTasks, getCourseTask } from "@/lib/course-tasks";
 
 export async function signOutAction() {
   const supabase = await createSupabaseServerClient();
@@ -14,17 +14,18 @@ export async function signOutAction() {
 }
 
 export async function completeCourseTaskAction(formData: FormData) {
-  const taskId = formData.get("taskId");
+  const moduleId = formData.get("moduleId");
+  const slug = formData.get("slug");
   const task =
-    typeof taskId === "string"
-      ? moduleZeroTasks.find((candidate) => candidate.id === taskId)
+    typeof moduleId === "string" && typeof slug === "string"
+      ? getCourseTask(moduleId, slug)
       : undefined;
 
   if (!task) {
     redirect("/dashboard");
   }
 
-  const taskPath = `/modules/0/tasks/${task.slug}`;
+  const taskPath = `/modules/${task.moduleId}/tasks/${task.slug}`;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -36,8 +37,7 @@ export async function completeCourseTaskAction(formData: FormData) {
 
   const { data: existingProgress, error: progressReadError } = await supabase
     .from("user_progress")
-    .select("task_id, is_completed")
-    .eq("module_id", "0");
+    .select("module_id, task_id, is_completed");
 
   if (progressReadError) {
     redirect(`${taskPath}?saveError=1`);
@@ -46,13 +46,19 @@ export async function completeCourseTaskAction(formData: FormData) {
   const completedTaskIds = new Set(
     (existingProgress ?? [])
       .filter((row) => row.is_completed)
-      .map((row) => row.task_id),
+      .map((row) => `${row.module_id}:${row.task_id}`),
   );
-  const taskIndex = moduleZeroTasks.findIndex(
-    (candidate) => candidate.id === task.id,
+  const taskIndex = courseTasks.findIndex(
+    (candidate) =>
+      candidate.moduleId === task.moduleId && candidate.id === task.id,
   );
 
-  if (moduleZeroTasks.slice(0, taskIndex).some((previous) => !completedTaskIds.has(previous.id))) {
+  if (
+    courseTasks.slice(0, taskIndex).some(
+      (previous) =>
+        !completedTaskIds.has(`${previous.moduleId}:${previous.id}`),
+    )
+  ) {
     redirect(`${taskPath}?blocked=1`);
   }
 
@@ -72,7 +78,7 @@ export async function completeCourseTaskAction(formData: FormData) {
   const { error } = await supabase.from("user_progress").upsert(
     {
       user_id: user.id,
-      module_id: "0",
+      module_id: task.moduleId,
       task_id: task.id,
       is_completed: true,
       completed_at: new Date().toISOString(),

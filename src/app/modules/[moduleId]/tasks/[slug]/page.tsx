@@ -2,11 +2,11 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { completeCourseTaskAction } from "@/app/actions";
+import { courseTasks, getCourseTask } from "@/lib/course-tasks";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getModuleZeroTask, moduleZeroTasks } from "@/lib/module-zero";
 
 type TaskPageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ moduleId: string; slug: string }>;
   searchParams: Promise<{
     blocked?: string;
     completed?: string;
@@ -14,44 +14,51 @@ type TaskPageProps = {
   }>;
 };
 
-export default async function ModuleZeroTaskPage({
+export default async function CourseTaskPage({
   params,
   searchParams,
 }: TaskPageProps) {
-  const [{ slug }, query] = await Promise.all([params, searchParams]);
-  const task = getModuleZeroTask(slug);
+  const [{ moduleId, slug }, query] = await Promise.all([params, searchParams]);
+  const task = getCourseTask(moduleId, slug);
 
   if (!task) {
     notFound();
   }
 
-  const taskIndex = moduleZeroTasks.findIndex(
-    (candidate) => candidate.id === task.id,
+  const taskIndex = courseTasks.findIndex(
+    (candidate) =>
+      candidate.moduleId === task.moduleId && candidate.id === task.id,
   );
-  const previousTask = moduleZeroTasks[taskIndex - 1];
-  const nextTask = moduleZeroTasks[taskIndex + 1];
+  const previousTask = courseTasks[taskIndex - 1];
+  const nextTask = courseTasks[taskIndex + 1];
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/auth/sign-in?next=${encodeURIComponent(`/modules/0/tasks/${slug}`)}`);
+    redirect(
+      `/auth/sign-in?next=${encodeURIComponent(`/modules/${moduleId}/tasks/${slug}`)}`,
+    );
   }
 
   const { data: progressRows, error: progressError } = await supabase
     .from("user_progress")
-    .select("task_id, is_completed, completed_at")
-    .eq("module_id", "0");
+    .select("module_id, task_id, is_completed, completed_at");
   const progressByTask = new Map(
-    (progressRows ?? []).map((row) => [row.task_id, row]),
+    (progressRows ?? []).map((row) => [
+      `${row.module_id}:${row.task_id}`,
+      row,
+    ]),
   );
-  const isCompleted = progressByTask.get(task.id)?.is_completed === true;
+  const currentProgress = progressByTask.get(`${task.moduleId}:${task.id}`);
+  const isCompleted = currentProgress?.is_completed === true;
   const previousTaskCompleted = previousTask
-    ? progressByTask.get(previousTask.id)?.is_completed === true
+    ? progressByTask.get(`${previousTask.moduleId}:${previousTask.id}`)
+        ?.is_completed === true
     : true;
   const canComplete = previousTaskCompleted && !progressError;
-  const completedAt = progressByTask.get(task.id)?.completed_at;
+  const completedAt = currentProgress?.completed_at;
 
   return (
     <main className="mx-auto min-h-[calc(100svh-4rem)] max-w-4xl px-6 py-10 sm:py-14">
@@ -64,7 +71,7 @@ export default async function ModuleZeroTaskPage({
 
       <header className="mt-8 border-b border-[var(--line)] pb-7">
         <p className="text-sm font-medium text-[var(--accent)]">
-          Модуль 0 · Задача {task.id}
+          Модуль {task.moduleId} · Задача {task.id}
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
           {task.title}
@@ -205,7 +212,8 @@ export default async function ModuleZeroTaskPage({
             </p>
           ) : canComplete ? (
             <form action={completeCourseTaskAction}>
-              <input name="taskId" type="hidden" value={task.id} />
+              <input name="moduleId" type="hidden" value={task.moduleId} />
+              <input name="slug" type="hidden" value={task.slug} />
               <button
                 className="min-h-11 rounded-md bg-[var(--accent)] px-5 text-sm font-semibold text-white transition hover:brightness-110"
                 type="submit"
@@ -222,7 +230,7 @@ export default async function ModuleZeroTaskPage({
         {nextTask ? (
           <Link
             className="text-sm font-medium text-[var(--accent)] underline underline-offset-4"
-            href={`/modules/0/tasks/${nextTask.slug}`}
+            href={`/modules/${nextTask.moduleId}/tasks/${nextTask.slug}`}
           >
             Следующая задача: {nextTask.id}
           </Link>

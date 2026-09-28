@@ -25,6 +25,14 @@ export const courseModules: CourseModule[] = [
     title: "TypeScript для автоматизатора",
     summary: "Типы, тестовые данные, асинхронность и конфигурация.",
     taskCount: 6,
+    tasks: [
+      { id: "1.1", slug: "1-1", title: "Типы TestUser и Note" },
+      { id: "1.2", slug: "1-2", title: "Уникальные тестовые данные" },
+      { id: "1.3", slug: "1-3", title: "Асинхронность и health-check" },
+      { id: "1.4", slug: "1-4", title: "Параллельные запросы" },
+      { id: "1.5", slug: "1-5", title: "Конфигурация URL" },
+      { id: "1.6", slug: "1-6", title: "Безопасность окружения" },
+    ],
   },
   {
     id: "2",

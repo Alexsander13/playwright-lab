@@ -1,4 +1,5 @@
-export type ModuleZeroTask = {
+export type CourseLesson = {
+  moduleId: string;
   id: string;
   slug: string;
   title: string;
@@ -15,8 +16,9 @@ export type ModuleZeroTask = {
   commands?: string[];
 };
 
-export const moduleZeroTasks: ModuleZeroTask[] = [
+export const moduleZeroTasks: CourseLesson[] = [
   {
+    moduleId: "0",
     id: "0.1",
     slug: "0-1",
     title: "Первый запуск автоматизации",
@@ -51,6 +53,7 @@ export const moduleZeroTasks: ModuleZeroTask[] = [
     ],
   },
   {
+    moduleId: "0",
     id: "0.2",
     slug: "0-2",
     title: "Создание и клонирование репозитория",
@@ -90,6 +93,7 @@ export const moduleZeroTasks: ModuleZeroTask[] = [
     commands: ["git clone <URL-вашего-репозитория>", "cd <имя-репозитория>", "git remote -v"],
   },
   {
+    moduleId: "0",
     id: "0.3",
     slug: "0-3",
     title: "Окружение и первый запуск Playwright",
@@ -128,6 +132,7 @@ export const moduleZeroTasks: ModuleZeroTask[] = [
     commands: ["node -v", "npm -v", "npm ci", "npx playwright install chromium", "npx playwright test"],
   },
   {
+    moduleId: "0",
     id: "0.4",
     slug: "0-4",
     title: "Базовая конфигурация Playwright",
@@ -161,6 +166,7 @@ export const moduleZeroTasks: ModuleZeroTask[] = [
     commands: ["npm run test", "npm run test:ui", "npm run test:debug", "npm run report"],
   },
   {
+    moduleId: "0",
     id: "0.5",
     slug: "0-5",
     title: "Первый smoke-тест",
