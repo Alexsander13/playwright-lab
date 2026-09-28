@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 import { profileFromAuthUser } from "@/lib/supabase/profile";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { CourseTaskActionState } from "@/lib/course-progress";
 import { courseTasks, getCourseTask } from "@/lib/course-tasks";
 
 export async function signOutAction() {
@@ -13,7 +14,10 @@ export async function signOutAction() {
   redirect("/");
 }
 
-export async function completeCourseTaskAction(formData: FormData) {
+export async function completeCourseTaskAction(
+  _previousState: CourseTaskActionState,
+  formData: FormData,
+): Promise<CourseTaskActionState> {
   const moduleId = formData.get("moduleId");
   const slug = formData.get("slug");
   const task =
@@ -22,7 +26,7 @@ export async function completeCourseTaskAction(formData: FormData) {
       : undefined;
 
   if (!task) {
-    redirect("/dashboard");
+    return { status: "error", message: "Не удалось определить задачу." };
   }
 
   const taskPath = `/modules/${task.moduleId}/tasks/${task.slug}`;
@@ -40,7 +44,10 @@ export async function completeCourseTaskAction(formData: FormData) {
     .select("module_id, task_id, is_completed");
 
   if (progressReadError) {
-    redirect(`${taskPath}?saveError=1`);
+    return {
+      status: "error",
+      message: "Не удалось загрузить прогресс. Попробуйте ещё раз.",
+    };
   }
 
   const completedTaskIds = new Set(
@@ -59,12 +66,18 @@ export async function completeCourseTaskAction(formData: FormData) {
         !completedTaskIds.has(`${previous.moduleId}:${previous.id}`),
     )
   ) {
-    redirect(`${taskPath}?blocked=1`);
+    return {
+      status: "error",
+      message: "Сначала завершите предыдущие задачи курса.",
+    };
   }
 
   if (completedTaskIds.has(task.id)) {
     revalidatePath("/dashboard");
-    redirect(`${taskPath}?completed=1`);
+    return {
+      status: "success",
+      message: `Задача ${task.id} уже отмечена выполненной.`,
+    };
   }
 
   const { error: profileError } = await supabase
@@ -72,7 +85,10 @@ export async function completeCourseTaskAction(formData: FormData) {
     .upsert(profileFromAuthUser(user), { onConflict: "id" });
 
   if (profileError) {
-    redirect(`${taskPath}?saveError=1`);
+    return {
+      status: "error",
+      message: "Не удалось подготовить профиль для сохранения прогресса.",
+    };
   }
 
   const { error } = await supabase.from("user_progress").upsert(
@@ -87,10 +103,15 @@ export async function completeCourseTaskAction(formData: FormData) {
   );
 
   if (error) {
-    redirect(`${taskPath}?saveError=1`);
+    return {
+      status: "error",
+      message: "Не удалось сохранить выполнение. Попробуйте ещё раз.",
+    };
   }
 
   revalidatePath("/dashboard");
-  revalidatePath(taskPath);
-  redirect(`${taskPath}?completed=1`);
+  return {
+    status: "success",
+    message: `Задача ${task.id} выполнена. Прогресс сохранён.`,
+  };
 }

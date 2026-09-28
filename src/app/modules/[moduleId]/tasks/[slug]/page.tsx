@@ -1,24 +1,16 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { completeCourseTaskAction } from "@/app/actions";
+import { CompleteTaskForm } from "@/components/complete-task-form";
 import { courseTasks, getCourseTask } from "@/lib/course-tasks";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type TaskPageProps = {
   params: Promise<{ moduleId: string; slug: string }>;
-  searchParams: Promise<{
-    blocked?: string;
-    completed?: string;
-    saveError?: string;
-  }>;
 };
 
-export default async function CourseTaskPage({
-  params,
-  searchParams,
-}: TaskPageProps) {
-  const [{ moduleId, slug }, query] = await Promise.all([params, searchParams]);
+export default async function CourseTaskPage({ params }: TaskPageProps) {
+  const { moduleId, slug } = await params;
   const task = getCourseTask(moduleId, slug);
 
   if (!task) {
@@ -183,22 +175,6 @@ export default async function CourseTaskPage({
           Не удалось загрузить прогресс. Обновите страницу чуть позже.
         </p>
       ) : null}
-      {query.saveError ? (
-        <p className="mt-6 border-l-2 border-red-600 pl-3 text-sm text-red-800" role="alert">
-          Не удалось сохранить выполнение. Попробуйте ещё раз.
-        </p>
-      ) : null}
-      {query.blocked ? (
-        <p className="mt-6 border-l-2 border-amber-600 pl-3 text-sm text-amber-900" role="alert">
-          Сначала завершите предыдущую задачу: {previousTask?.id} · {previousTask?.title}.
-        </p>
-      ) : null}
-      {query.completed ? (
-        <p className="mt-6 border-l-2 border-[var(--accent)] pl-3 text-sm font-medium text-[var(--accent)]" role="status">
-          Задача {task.id} отмечена как выполненная.
-        </p>
-      ) : null}
-
       <footer className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-[var(--line)] pt-6">
         <div>
           {isCompleted ? (
@@ -211,16 +187,11 @@ export default async function CourseTaskPage({
                 : ""}
             </p>
           ) : canComplete ? (
-            <form action={completeCourseTaskAction}>
-              <input name="moduleId" type="hidden" value={task.moduleId} />
-              <input name="slug" type="hidden" value={task.slug} />
-              <button
-                className="min-h-11 rounded-md bg-[var(--accent)] px-5 text-sm font-semibold text-white transition hover:brightness-110"
-                type="submit"
-              >
-                Отметить задачу выполненной
-              </button>
-            </form>
+            <CompleteTaskForm
+              moduleId={task.moduleId}
+              slug={task.slug}
+              taskId={task.id}
+            />
           ) : (
             <p className="text-sm text-[var(--muted)]">
               Завершите предыдущую задачу, чтобы открыть отметку выполнения.
