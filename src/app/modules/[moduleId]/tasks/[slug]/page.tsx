@@ -74,6 +74,36 @@ export default async function CourseTaskPage({ params }: TaskPageProps) {
       </header>
 
       <div className="divide-y divide-[var(--line)]">
+        {task.video ? (
+          <section className="py-7">
+            <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-white shadow-sm">
+              <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+                <p className="text-sm font-semibold text-[var(--accent)]">
+                  Дополнительный материал
+                </p>
+                <h2 className="mt-1 text-lg font-semibold">{task.video.title}</h2>
+                <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+                  {task.video.description}
+                </p>
+              </div>
+              <video
+                aria-label={task.video.title}
+                className="aspect-video w-full bg-[#202522]"
+                controls
+                playsInline
+                preload="metadata"
+              >
+                <source src={task.video.src} type="video/mp4" />
+                Ваш браузер не поддерживает встроенное видео. Откройте файл по ссылке: {" "}
+                <a className="underline" href={task.video.src}>
+                  {task.video.title}
+                </a>
+                .
+              </video>
+            </div>
+          </section>
+        ) : null}
+
         <section className="py-7">
           <h2 className="text-lg font-semibold">Контекст и проблема</h2>
           <p className="mt-3 max-w-2xl leading-7 text-[var(--muted)]">

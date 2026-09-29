@@ -13,6 +13,11 @@ export type CourseLesson = {
   checkpoint?: string;
   downloadPath?: string;
   externalLink?: { href: string; label: string };
+  video?: {
+    src: string;
+    title: string;
+    description: string;
+  };
   commands?: string[];
 };
 
@@ -23,6 +28,12 @@ export const moduleZeroTasks: CourseLesson[] = [
     slug: "0-1",
     title: "Первый запуск автоматизации",
     summary: "Увидеть работающий браузерный сценарий до настройки проекта.",
+    video: {
+      src: "/course-media/lesson-0-1.mp4",
+      title: "Видео к уроку 0.1",
+      description:
+        "Посмотрите вводное видео перед первым запуском автоматизации.",
+    },
     context:
       "До установки окружения и изучения конфигурации важно увидеть, к какому результату ведёт курс. Готовый сценарий отделяет цель автоматизации от деталей настройки.",
     theory: [
