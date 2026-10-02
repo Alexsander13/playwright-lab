@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "verify": "npm run audit:content && tsc --noEmit && next build",
     "start": "next start",
     "dev": "next dev",
     "cli:dev": "tsx src/index.ts",
-    "demo:0.1": "tsx scripts/demo-0.1.ts"
+    "demo:0.1": "tsx scripts/demo-0.1.ts",
+    "audit:content": "tsx scripts/audit-course-content.ts",
+    "audit:live": "playwright test -c playwright.audit.config.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.10.2",
     "@types/react": "^19.3.0",

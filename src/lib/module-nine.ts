@@ -9,9 +9,8 @@ export const moduleNineTasks = withModuleId("9", [
     theory: ["OpenRouter key предоставляет доступ к выбранным моделям и должен считаться паролем.", "IDE config с ключом не коммитится и не добавляется в issue/screenshot."],
     steps: ["Создайте OpenRouter key в своём аккаунте.", "Настройте Continue.dev или Cline локально, используя secret storage extension.", "Выберите доступную модель и проверьте безопасный короткий prompt.", "Убедитесь, что конфиг с credential не отслеживается Git."],
     files: ["Локальная настройка IDE вне репозитория"],
-    definitionOfDone: ["IDE assistant успешно отправляет запрос выбранной модели.", "API key хранится только локально/в secret storage.", "В git status нет файла с credential."],
+definitionOfDone: ["IDE assistant успешно отправляет запрос выбранной модели.", "API key хранится только локально/в secret storage.", "В git status нет файла с credential."],
     hints: ["Сначала проверьте документацию установленного extension.", "Используйте встроенный secret manager extension, не храните key в workspace settings.", "Перед commit выполните поиск по имени config и убедитесь, что credential файл ignored."],
-    checkpoint: "chore(ai): configure local AI assistant and OpenRouter",
   },
   {
     id: "9.2",
@@ -21,9 +20,8 @@ export const moduleNineTasks = withModuleId("9", [
     theory: ["DOM snippet должен быть минимальным и относиться только к задаче.", "Пароли, пользовательские данные, cookies и auth headers запрещено отправлять в prompt."],
     steps: ["Выберите нестабильный, несекретный фрагмент DOM.", "Удалите значения формы, личные данные и session material.", "Попросите предложить role/test id locator и объяснить предпосылки.", "Проверьте locator в Playwright Inspector и оставьте только работающий вариант."],
     files: ["Один релевантный spec без секретных prompt-файлов"],
-    definitionOfDone: ["Предложенный locator проверен вручную и отражает роль/имя.", "В prompt не попали credentials, личные данные или полный DOM.", "Итоговый тест не зависит от AI runtime."],
+definitionOfDone: ["Предложенный locator проверен вручную и отражает роль/имя.", "В prompt не попали credentials, личные данные или полный DOM.", "Итоговый тест не зависит от AI runtime."],
     hints: ["Начните с доступной роли и имени элемента.", "Перед передачей фрагмента удалите значения input и user-specific content.", "Попросите несколько вариантов с tradeoff, затем подтвердите выбранный через locator.count/Inspector."],
-    checkpoint: "test(ui): validate resilient locator suggested by AI",
   },
   {
     id: "9.3",
@@ -33,9 +31,8 @@ export const moduleNineTasks = withModuleId("9", [
     theory: ["Playwright Reporter API предоставляет onTestEnd и TestResult.", "Текст ошибки и stack trace требуют sanitization перед сохранением или передачей."],
     steps: ["Создайте reporters/safe-failure-reporter.ts.", "Реализуйте Reporter interface и выберите hook для завершения теста.", "На failure выведите title/status и очищенный error summary.", "Зарегистрируйте reporter в playwright.config.ts и проверьте его на безопасном временном failure, затем удалите trigger."],
     files: ["reporters/safe-failure-reporter.ts", "playwright.config.ts"],
-    definitionOfDone: ["Reporter получает failure event.", "Лог содержит имя теста и безопасный текст ошибки.", "Токены, личные данные, headers и полный DOM не попадают в отчёт."],
+definitionOfDone: ["Reporter получает failure event.", "Лог содержит имя теста и безопасный текст ошибки.", "Токены, личные данные, headers и полный DOM не попадают в отчёт."],
     hints: ["Начните с Reporter interface и onTestEnd.", "Сформируйте локальный DTO только из нужных полей.", "Перед логом пропускайте строки через sanitizer, маскирующий secret patterns."],
-    checkpoint: "feat(reporter): implement sanitized failure reporter",
   },
   {
     id: "9.4",
@@ -45,8 +42,7 @@ export const moduleNineTasks = withModuleId("9", [
     theory: ["Allowlist допустимых полей безопаснее отправки полного report object.", "Нельзя отправлять полный DOM, request/response headers, cookies, auth token, email или environment dump."],
     steps: ["Добавьте API key только в локальный env и секрет GitHub Actions; никогда не используйте NEXT_PUBLIC_ prefix.", "Соберите allowlisted payload из error text, stack и минимального связанного DOM excerpt.", "Маскируйте email, пароли, x-auth-token, cookies и значения env до network call.", "При отсутствии key или HTTP ошибке завершайте reporter без утечки данных и не ломайте первичный результат теста.", "Выведите только краткую модельную рекомендацию и явно обозначьте её как непроверенную гипотезу."],
     files: ["reporters/safe-failure-reporter.ts", ".env.example", ".gitignore"],
-    definitionOfDone: ["Payload содержит только разрешённые и очищенные поля.", "API key отсутствует в клиентском bundle, logs и Git.", "Ошибка AI-запроса не маскирует исходный test failure.", "Отчёт не отправляет full DOM или network headers."],
+definitionOfDone: ["Payload содержит только разрешённые и очищенные поля.", "API key отсутствует в клиентском bundle, logs и Git.", "Ошибка AI-запроса не маскирует исходный test failure.", "Отчёт не отправляет full DOM или network headers."],
     hints: ["Сначала опишите allowlist payload до добавления HTTP клиента.", "Используйте server-side env lookup и отказывайтесь от запроса при пустом key.", "Проверьте сериализованный payload на fixture строках с dummy token/email, не используя реальные секреты."],
-    checkpoint: "feat(reporter): add secure OpenRouter failure analysis",
   },
 ]);

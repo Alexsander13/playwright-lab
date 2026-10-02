@@ -8,8 +8,9 @@ import { moduleSixTasks } from "@/lib/module-six";
 import { moduleSevenTasks } from "@/lib/module-seven";
 import { moduleEightTasks } from "@/lib/module-eight";
 import { moduleNineTasks } from "@/lib/module-nine";
+import { adaptLessonForBeginner } from "@/lib/beginner-lesson-content";
 
-export const courseTasks = [
+const rawCourseTasks = [
   ...moduleZeroTasks,
   ...moduleOneTasks,
   ...moduleTwoTasks,
@@ -21,6 +22,8 @@ export const courseTasks = [
   ...moduleEightTasks,
   ...moduleNineTasks,
 ];
+
+export const courseTasks = rawCourseTasks.map(adaptLessonForBeginner);
 
 export function getCourseTask(moduleId: string, slug: string) {
   return courseTasks.find(

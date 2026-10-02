@@ -72,7 +72,7 @@ export async function completeCourseTaskAction(
     };
   }
 
-  if (completedTaskIds.has(task.id)) {
+  if (completedTaskIds.has(`${task.moduleId}:${task.id}`)) {
     revalidatePath("/dashboard");
     return {
       status: "success",

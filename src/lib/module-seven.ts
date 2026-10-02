@@ -9,9 +9,8 @@ export const moduleSevenTasks = withModuleId("7", [
     theory: ["Auto-waiting и web-first assertions ждут ожидаемый UI state.", "Повторный запуск без диагностики не исправляет гонку."],
     steps: ["Запустите указанный flaky spec несколько раз.", "Изучите trace, assertion и момент появления элемента.", "Классифицируйте причину: состояние UI, сеть, данные или shared resource.", "Замените waitForTimeout на assertion/event wait и повторите прогон."],
     files: ["tests/ui/flaky.spec.ts"],
-    definitionOfDone: ["Причина нестабильности записана и устранена.", "В коде нет page.waitForTimeout.", "Тест ожидает конкретное observable state."],
+definitionOfDone: ["Причина нестабильности записана и устранена.", "В коде нет page.waitForTimeout.", "Тест ожидает конкретное observable state."],
     hints: ["Сначала сохраните фактическую ошибку, не добавляя retry.", "Сверьте таймлайн действия и события в trace.", "Ждите locator state/response/event, который причинно связан с действием."],
-    checkpoint: "test(debug): fix flaky test and remove waitForTimeout",
     commands: ["npm run test -- tests/ui/flaky.spec.ts --repeat-each=5"],
   },
   {
@@ -22,9 +21,8 @@ export const moduleSevenTasks = withModuleId("7", [
     theory: ["trace: on-first-retry экономит место и сохраняет данные для повторной попытки.", "Артефакты могут содержать персональные данные и должны иметь ограниченный доступ."],
     steps: ["Настройте trace на on-first-retry.", "Настройте screenshot и video только при failure.", "Сделайте локальный контрольный запуск с безопасно падающим тестом.", "Откройте trace viewer и найдите ошибочный шаг; удалите тестовый trigger после проверки."],
     files: ["playwright.config.ts", ".gitignore"],
-    definitionOfDone: ["Trace, screenshot и video создаются по выбранной failure policy.", "Артефакт можно открыть и связать с упавшим шагом.", "Секретные значения не выводятся и не публикуются."],
+definitionOfDone: ["Trace, screenshot и video создаются по выбранной failure policy.", "Артефакт можно открыть и связать с упавшим шагом.", "Секретные значения не выводятся и не публикуются."],
     hints: ["Храните настройку в use config.", "Проверьте значение on-first-retry и retain-on-failure.", "Используйте `npx playwright show-trace <trace.zip>` для локального анализа."],
-    checkpoint: "chore(config): configure trace, screenshots and video on failure",
     commands: ["npm run test", "npx playwright show-trace test-results/<trace>.zip"],
   },
   {
@@ -35,9 +33,8 @@ export const moduleSevenTasks = withModuleId("7", [
     theory: ["worker count управляет количеством параллельных процессов.", "Данные каждого теста должны быть изолированы и очищаться владельцем."],
     steps: ["Запустите подходящий suite с 2 workers, затем с 4.", "Зафиксируйте конфликты ресурсов и привяжите их к тестам.", "Внедрите runId/worker suffix из задачи 5.5.", "Повторите запуск и убедитесь, что данные не пересекаются."],
     files: ["playwright.config.ts", "src/utils/test-data.ts", "tests/fixtures.ts"],
-    definitionOfDone: ["Выбранные тесты проходят в 2–4 workers.", "Каждый ресурс уникален для test/worker/run.", "Cleanup одного теста не меняет данные другого."],
+definitionOfDone: ["Выбранные тесты проходят в 2–4 workers.", "Каждый ресурс уникален для test/worker/run.", "Cleanup одного теста не меняет данные другого."],
     hints: ["Сначала запускайте только изолируемый набор.", "Используйте workerInfo и общий runId.", "Не делите одну запись или пользователя между независимыми тестами."],
-    checkpoint: "test(parallel): configure multi-worker execution and isolate data",
     commands: ["npx playwright test --workers=2", "npx playwright test --workers=4"],
   },
   {
@@ -48,9 +45,8 @@ export const moduleSevenTasks = withModuleId("7", [
     theory: ["fullyParallel влияет на независимое выполнение тестов внутри файлов.", "maxFailures останавливает запуск после заданного количества ошибок."],
     steps: ["Подтвердите, что предыдущая задача стабильно проходит с несколькими workers.", "Включите fullyParallel.", "Задайте разумный maxFailures и объясните выбор.", "Запустите suite с несколькими workers и сравните итоговое время и ошибки."],
     files: ["playwright.config.ts"],
-    definitionOfDone: ["fullyParallel включён после проверки изоляции.", "maxFailures задокументирован и ограничивает массовые ошибки.", "Параллельный прогон не создаёт data collisions."],
+definitionOfDone: ["fullyParallel включён после проверки изоляции.", "maxFailures задокументирован и ограничивает массовые ошибки.", "Параллельный прогон не создаёт data collisions."],
     hints: ["Не включайте fullyParallel, пока тесты используют общие изменяемые ресурсы.", "Начните с небольшого maxFailures.", "Сравните trace падений до и после включения полной параллельности."],
-    checkpoint: "refactor(config): enable fullyParallel and set maxFailures",
     commands: ["npx playwright test --workers=4"],
   },
 ]);

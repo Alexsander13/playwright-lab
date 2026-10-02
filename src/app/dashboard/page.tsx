@@ -68,6 +68,22 @@ export default async function DashboardPage() {
     user.email?.split("@")[0] ??
     "участник";
 
+  const unlockedTaskIds = new Set<string>();
+  for (let i = 0; i < courseTasks.length; i++) {
+    const task = courseTasks[i];
+    const key = `${task.moduleId}:${task.id}`;
+    if (i === 0) {
+      unlockedTaskIds.add(key);
+    } else {
+      const prevTask = courseTasks[i - 1];
+      const prevCompleted =
+        completedByModule.get(prevTask.moduleId)?.has(prevTask.id) ?? false;
+      if (prevCompleted) {
+        unlockedTaskIds.add(key);
+      }
+    }
+  }
+
   return (
     <main className="mx-auto min-h-[calc(100svh-4rem)] max-w-6xl px-6 py-10 sm:py-14">
       <section className="border-b border-[var(--line)] pb-8">
@@ -116,15 +132,13 @@ export default async function DashboardPage() {
           <h2 className="text-xl font-semibold" id="modules-heading">
             Программа курса
           </h2>
-          <span className="text-sm text-[var(--muted)]">10 модулей · 59 задач</span>
+          <span className="text-sm text-[var(--muted)]">10 модулей · {courseTaskCount} задач</span>
         </div>
 
         <ol className="mt-4 divide-y divide-[var(--line)]">
           {courseModules.map((courseModule, index) => {
             const completedTasks = completedByModule.get(courseModule.id) ?? new Set();
             const completedCount = completedTasks.size;
-            const completedLessons =
-              courseModule.tasks?.filter((task) => completedTasks.has(task.id)) ?? [];
             const modulePercent = Math.round(
               (completedCount / courseModule.taskCount) * 100,
             );
@@ -164,22 +178,66 @@ export default async function DashboardPage() {
                       Завершите предыдущий модуль, чтобы открыть задачи.
                     </p>
                   ) : null}
-                  {completedLessons.length > 0 ? (
-                    <details className="mt-2 max-w-lg">
-                      <summary className="min-h-9 cursor-pointer py-2 text-sm font-medium text-[var(--muted)] underline decoration-[var(--line)] underline-offset-4 hover:text-[var(--ink)]">
-                        Пройденные уроки · {completedLessons.length}
+
+                  {courseModule.tasks?.length ? (
+                    <details
+                      className="mt-3 max-w-xl"
+                      open={
+                        completedCount > 0 ||
+                        nextCourseTask?.moduleId === courseModule.id
+                      }
+                    >
+                      <summary className="min-h-9 cursor-pointer py-1.5 text-sm font-medium text-[var(--muted)] underline decoration-[var(--line)] underline-offset-4 hover:text-[var(--ink)]">
+                        Уроки модуля ({completedCount} из {courseModule.taskCount} пройдено)
                       </summary>
-                      <ol className="ml-2 border-l border-[var(--line)] py-1 pl-4">
-                        {completedLessons.map((lesson) => (
-                          <li key={lesson.id}>
-                            <Link
-                              className="inline-flex min-h-9 items-center text-sm text-[var(--accent)] underline underline-offset-4"
-                              href={`/modules/${courseModule.id}/tasks/${lesson.slug}`}
+                      <ol className="mt-2 ml-2 space-y-2 border-l-2 border-[#d6e3da] pl-4">
+                        {courseModule.tasks.map((lesson) => {
+                          const isCompleted = completedTasks.has(lesson.id);
+                          const isUnlocked =
+                            isCompleted ||
+                            unlockedTaskIds.has(
+                              `${courseModule.id}:${lesson.id}`,
+                            );
+
+                          if (isUnlocked) {
+                            return (
+                              <li
+                                className="flex items-center gap-2.5"
+                                key={lesson.id}
+                              >
+                                <span
+                                  className={
+                                    isCompleted
+                                      ? "flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[10px] font-bold text-white"
+                                      : "flex size-5 shrink-0 items-center justify-center rounded-full bg-[#d5e6d9] text-[10px] font-bold text-[var(--accent)]"
+                                  }
+                                >
+                                  {isCompleted ? "✓" : "→"}
+                                </span>
+                                <Link
+                                  className="inline-flex min-h-7 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4"
+                                  href={`/modules/${courseModule.id}/tasks/${lesson.slug}`}
+                                >
+                                  {lesson.id} · {lesson.title}
+                                </Link>
+                              </li>
+                            );
+                          }
+
+                          return (
+                            <li
+                              className="flex items-center gap-2.5 text-sm text-[var(--muted)] opacity-65"
+                              key={lesson.id}
                             >
-                              {lesson.id} · {lesson.title}
-                            </Link>
-                          </li>
-                        ))}
+                              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#e5ece7] text-[10px] text-[var(--muted)]">
+                                🔒
+                              </span>
+                              <span className="cursor-not-allowed">
+                                {lesson.id} · {lesson.title}
+                              </span>
+                            </li>
+                          );
+                        })}
                       </ol>
                     </details>
                   ) : null}
